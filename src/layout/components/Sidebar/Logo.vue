@@ -25,7 +25,7 @@ export default {
   },
   data() {
     return {
-      title: '温格科技后台管理',
+      title: 'eladmin',
       logo: Logo
     }
   }
