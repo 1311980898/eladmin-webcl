@@ -46,6 +46,20 @@
           <el-form-item label="食品名称" prop="foodName">
             <el-input v-model="form.foodName" style="width: 370px;" />
           </el-form-item>
+          <el-form-item v-if="crud.status.add" label="食品图片">
+            <el-upload
+              ref="upload"
+              :limit="1"
+              :before-upload="beforeUpload"
+              :auto-upload="false"
+              :headers="headers"
+              :on-success="handleSuccess"
+              :on-error="handleError"
+              :action="fileUploadApi + '?name=' + form.name"
+            >
+              <div class="eladmin-upload"><i class="el-icon-upload" /> 添加图片</div>
+            </el-upload>
+          </el-form-item>
           <el-form-item label="食品类型" prop="foodType">
             <el-radio v-for="item in dict.food_type" :key="item.id" v-model="form.foodType" :label="item.value">{{ item.label }}</el-radio>
           </el-form-item>
@@ -84,6 +98,16 @@
         <!--
         <el-table-column prop="description" label="描述" />
 -->
+        <el-table-column prop="imgUrl" label="食品图片" width="150">
+          <template slot-scope="scope">
+            <el-image
+              style="width: 100px; height: 100px"
+              fit="contain"
+              :src="scope.row.photoPath"
+              :preview-src-list="[scope.row.photoPath]"
+            />
+          </template>
+        </el-table-column>
         <el-table-column prop="foodType" label="食品类型">
           <template slot-scope="scope">
             {{ dict.label.food_type[scope.row.foodType] }}
@@ -167,6 +191,37 @@ export default {
     // 钩子：在获取表格数据之前执行，false 则代表不获取数据
     [CRUD.HOOK.beforeRefresh]() {
       return true
+    },
+    // 上传文件
+    upload() {
+      this.$refs.upload.submit()
+    },
+    beforeUpload(file) {
+      let isLt2M = true
+      isLt2M = file.size / 1024 / 1024 < 100
+      if (!isLt2M) {
+        this.loading = false
+        this.$message.error('上传文件大小不能超过 100MB!')
+      }
+      this.form.name = file.name
+      return isLt2M
+    },
+    handleSuccess(response, file, fileList) {
+      this.crud.notify('上传成功', CRUD.NOTIFICATION_TYPE.SUCCESS)
+      this.$refs.upload.clearFiles()
+      this.crud.status.add = CRUD.STATUS.NORMAL
+      this.crud.resetForm()
+      this.crud.toQuery()
+    },
+    // 监听上传失败
+    handleError(e, file, fileList) {
+      const msg = JSON.parse(e.message)
+      this.$notify({
+        title: msg.message,
+        type: 'error',
+        duration: 2500
+      })
+      this.loading = false
     }
   }
 }

@@ -6,8 +6,6 @@
         <!-- 搜索 -->
         <label class="el-form-item-label">订单号</label>
         <el-input v-model="query.orderNo" clearable placeholder="订单号" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
-        <label class="el-form-item-label">商品id</label>
-        <el-input v-model="query.productId" clearable placeholder="商品id" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">订单金额</label>
         <el-input v-model="query.totalAmount" clearable placeholder="订单金额" style="width: 185px;" class="filter-item" @keyup.enter.native="crud.toQuery" />
         <label class="el-form-item-label">订单状态</label>
@@ -43,9 +41,6 @@
           <el-form-item label="订单号">
             <el-input v-model="form.orderNo" style="width: 370px;" />
           </el-form-item>
-          <el-form-item label="商品id">
-            <el-input v-model="form.productId" style="width: 370px;" />
-          </el-form-item>
           <el-form-item label="下单时间">
             <el-input v-model="form.orderDate" style="width: 370px;" />
           </el-form-item>
@@ -73,9 +68,18 @@
       <!--表格渲染-->
       <el-table ref="table" v-loading="crud.loading" :data="crud.data" size="small" style="width: 100%;" @selection-change="crud.selectionChangeHandler">
         <el-table-column type="selection" width="55" />
-        <el-table-column prop="id" label="id" />
         <el-table-column prop="orderNo" label="订单号" />
-        <el-table-column prop="productId" label="商品id" />
+        <el-table-column prop="food.foodName" label="商品名称" />
+        <el-table-column prop="foodUrl" label="商品图片" width="150">
+          <template slot-scope="scope">
+            <el-image
+              style="width: 100px; height: 100px"
+              fit="contain"
+              :src="scope.row.foodUrl"
+              :preview-src-list="[scope.row.foodUrl]"
+            />
+          </template>
+        </el-table-column>
         <el-table-column prop="orderDate" label="下单时间" />
         <el-table-column prop="totalAmount" label="订单金额" />
         <el-table-column prop="status" label="订单状态" />
