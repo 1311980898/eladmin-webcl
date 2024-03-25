@@ -168,7 +168,7 @@ export default {
           { required: true, message: '价格不能为空', trigger: 'blur' }
         ],
         supplier: [
-          { required: true, message: '供应商不能为空', trigger: 'blur' }
+          { required: false, message: '供应商不能为空', trigger: 'blur' }
         ]
       },
       queryTypeOptions: [
