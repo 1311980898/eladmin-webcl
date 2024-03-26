@@ -50,7 +50,11 @@
             <el-button type="primary" @click="uploadPicture">上传图片</el-button>
             <div v-if="form.photoPath" class="picture">
               <a :href="form.photoPath" target="_blank">
-                <img :src="form.photoPath" class="uploaded-image">
+                <el-image
+                  :src="getImageSrc(form.photoPath)"
+                  :preview-src-list="[getImageSrc(form.photoPath)]"
+                  class="uploaded-image"
+                />
               </a>
               <el-button class="del" type="danger" @click="deletePicture">删除</el-button>
             </div>
@@ -92,7 +96,7 @@
         <!--
         <el-table-column prop="description" label="描述" />
 -->
-        <el-table-column prop="imgUrl" label="商品图片" width="150">
+        <!--        <el-table-column prop="imgUrl" label="商品图片" width="150">
           <template slot-scope="scope">
             <el-image
               style="width: 100px; height: 100px"
@@ -102,6 +106,33 @@
             />
           </template>
         </el-table-column>
+        <el-table-column prop="photoPath" label="预览图">
+          <template slot-scope="{row}">
+            <el-image
+              :src="row.photoPath"
+              :preview-src-list="row.photoPath"
+              fit="contain"
+              lazy
+              class="el-avatar"
+            >
+              <div slot="error">
+                <i class="el-icon-document" />
+              </div>
+            </el-image>
+          </template>
+        </el-table-column>-->
+        <template>
+          <el-table-column prop="imgUrl" label="商品图片" width="150">
+            <template slot-scope="scope">
+              <el-image
+                style="width: 100px; height: 100px"
+                fit="contain"
+                :src="getImageSrc(scope.row.photoPath)"
+                :preview-src-list="[getImageSrc(scope.row.photoPath)]"
+              />
+            </template>
+          </el-table-column>
+        </template>
         <el-table-column prop="foodType" label="商品类型">
           <template slot-scope="scope">
             {{ dict.label.food_type[scope.row.foodType] }}
@@ -212,7 +243,7 @@ export default {
         // 发送图片上传请求
         axios.post('http://localhost:8000/api/localStorage/picturesV2', formData)
           .then(response => {
-            this.form.photoPath = response.data.path // 假设后端返回的字段名为imageUrl
+            this.form.photoPath = response.data.realName // 假设后端返回的字段名为imageUrl
           })
           .catch(error => {
             console.error('上传失败:', error)
@@ -223,6 +254,17 @@ export default {
     // 删除图片
     deletePicture() {
       this.form.photoPath = null
+    },
+    getImageSrc(path) {
+      // 检查路径是否是网络链接
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path // 直接返回网络链接
+      } else {
+        // 处理本地文件路径
+        // 在这里你可以根据具体情况，比如拼接服务器地址或者通过其他方式处理本地路径
+        // 这里只是简单示例，假设你的本地文件路径是相对于服务器的相对路径
+        return 'http://localhost:8000/file/图片/' + path
+      }
     }
   }
 }
